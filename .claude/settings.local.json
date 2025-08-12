@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose:*)",
+      "Bash(npm start)",
+      "Bash(npm run:*)",
+      "Bash(npm install)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_snapshot",
+      "Bash(npm install:*)",
+      "Bash(docker-compose:*)",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_select_option",
+      "Bash(touch:*)"
+    ],
+    "deny": []
+  }
+}

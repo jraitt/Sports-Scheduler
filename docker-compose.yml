@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  sports-scheduler:
+    build: .
+    ports:
+      - "${DOCKER_HOST_PORT}:${DOCKER_CONTAINER_PORT}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - VITE_HOST=${VITE_HOST}
+      - VITE_PORT=${VITE_PORT}
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true
