@@ -8,11 +8,13 @@ export default defineConfig({
     port: parseInt(process.env.VITE_PORT) || 3030,
     watch: {
       usePolling: true
-    }
+    },
+    allowedHosts: ['pickle.compound-interests.com', 'localhost', '127.0.0.1']
   },
   preview: {
     host: process.env.VITE_HOST || '0.0.0.0',
     port: parseInt(process.env.VITE_PORT) || 3030,
-    strictPort: true
+    strictPort: true,
+    allowedHosts: ['pickle.compound-interests.com', 'localhost', '127.0.0.1']
   }
 })
