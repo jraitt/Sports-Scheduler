@@ -36,7 +36,6 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
           value={editData.date}
           onChange={(e) => setEditData({ ...editData, date: e.target.value })}
           className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          min={new Date().toISOString().split('T')[0]}
         />
         
         <input
@@ -223,57 +222,105 @@ const EditPlayerModal = React.memo(({
   );
 });
 
-const AddPlayerForm = React.memo(({ onAddPlayer }) => {
-  const [localPlayer, setLocalPlayer] = useState({ name: '', phone: '' });
+const AddPlayerModal = React.memo(({ 
+  isOpen, 
+  onClose, 
+  onAddPlayer
+}) => {
+  const [playerData, setPlayerData] = useState({ name: '', phone: '' });
 
-  const handleNameChange = useCallback((e) => {
-    setLocalPlayer(prev => ({ ...prev, name: e.target.value }));
-  }, []);
-
-
-  const handlePhoneChange = useCallback((e) => {
-    setLocalPlayer(prev => ({ ...prev, phone: e.target.value }));
-  }, []);
-
-  const handleSubmit = useCallback(() => {
-    if (localPlayer.name.trim()) {
-      onAddPlayer(localPlayer);
-      setLocalPlayer({ name: '', phone: '' });
+  // Reset form when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setPlayerData({ name: '', phone: '' });
     }
-  }, [localPlayer, onAddPlayer]);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleSave = () => {
+    if (playerData.name.trim()) {
+      onAddPlayer(playerData);
+      setPlayerData({ name: '', phone: '' });
+      onClose();
+    }
+  };
 
   return (
-    <div className="bg-gradient-to-r from-white to-purple-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-      <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-        <Plus className="mr-2 h-5 w-5 text-purple-600" />
-        Add New Player
-      </h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <input
-          type="text"
-          placeholder="Player Name"
-          value={localPlayer.name}
-          onChange={handleNameChange}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          autoComplete="off"
-        />
-        
-        <input
-          type="tel"
-          placeholder="Phone Number"
-          value={localPlayer.phone}
-          onChange={handlePhoneChange}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        
-        <button
-          onClick={handleSubmit}
-          disabled={!localPlayer.name.trim()}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          Add Player
-        </button>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-gradient-to-br from-white to-purple-50 rounded-xl shadow-2xl max-w-md w-full border border-purple-200">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between p-6 border-b border-purple-200 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-xl">
+          <h2 className="text-xl font-semibold text-white flex items-center drop-shadow-sm">
+            <Plus className="mr-2 h-5 w-5" />
+            Add New Player
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-white/80 hover:text-white transition-colors hover:bg-white/20 rounded-full p-1"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Modal Content */}
+        <div className="p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Player Name *
+              </label>
+              <input
+                type="text"
+                value={playerData.name}
+                onChange={(e) => setPlayerData({ ...playerData, name: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter player name"
+                autoComplete="off"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={playerData.phone}
+                onChange={(e) => setPlayerData({ ...playerData, phone: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter phone number (optional)"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex items-center justify-end space-x-3 p-6 border-t border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 rounded-b-xl">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!playerData.name.trim()}
+            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Player
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -330,7 +377,6 @@ const NewGameModal = React.memo(({
                 value={newMatch.date}
                 onChange={(e) => setNewMatch({ ...newMatch, date: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                min={new Date().toISOString().split('T')[0]}
               />
             </div>
             
@@ -433,7 +479,7 @@ const PickleballScheduler = () => {
   const [newMatch, setNewMatch] = useState({
     date: '',
     time: '17:30',
-    court: '',
+    court: '1',
     players: []
   });
 
@@ -441,6 +487,7 @@ const PickleballScheduler = () => {
   const [showNewGameModal, setShowNewGameModal] = useState(false);
   const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [showAddPlayerModal, setShowAddPlayerModal] = useState(false);
 
   // Load data from Supabase on component mount
   useEffect(() => {
@@ -486,7 +533,7 @@ const PickleballScheduler = () => {
         
         const createdMatch = await matchesAPI.create(matchData);
         setMatches([...matches, createdMatch]);
-        setNewMatch({ date: '', time: '17:30', court: '', players: [] });
+        setNewMatch({ date: '', time: '17:30', court: '1', players: [] });
       } catch (err) {
         console.error('Error adding match:', err);
         setError('Failed to add game. Please try again.');
@@ -619,122 +666,158 @@ const PickleballScheduler = () => {
     });
   };
 
-  const ScheduleTab = () => (
-    <div className="space-y-6">
-      {/* Scheduled Games */}
+  const ScheduleTab = () => {
+    // Get today's date for comparison
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter matches into future and past
+    const futureMatches = matches.filter(match => {
+      const matchDate = new Date(match.date + 'T00:00:00');
+      return matchDate >= today;
+    }).sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+    
+    const pastMatches = matches.filter(match => {
+      const matchDate = new Date(match.date + 'T00:00:00');
+      return matchDate < today;
+    }).sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+
+    const renderGamesSection = (gamesList, title, emptyMessage, headerGradient) => (
       <div className="bg-gradient-to-r from-white to-orange-50 rounded-xl shadow-lg border border-orange-100">
-        <div className="p-6 border-b border-orange-200 bg-gradient-to-r from-orange-500 to-teal-500 rounded-t-xl">
+        <div className={`p-6 border-b border-orange-200 ${headerGradient} rounded-t-xl`}>
           <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
             <Calendar className="mr-2 h-5 w-5" />
-            Scheduled Games
+            {title} ({gamesList.length})
           </h3>
         </div>
         
         <div className="space-y-4 p-4 sm:p-6">
-          {matches.length === 0 ? (
+          {gamesList.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
-              No games scheduled yet. Create your first game using "New Game" above!
+              {emptyMessage}
             </div>
           ) : (
-            matches
-              .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))
-              .map((match, index) => {
-                const cardGradients = [
-                  'bg-gradient-to-br from-orange-100 to-red-100 border-orange-200',
-                  'bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200', 
-                  'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-200',
-                  'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-200',
-                  'bg-gradient-to-br from-green-100 to-teal-100 border-green-200'
-                ];
-                const cardStyle = cardGradients[index % cardGradients.length];
-                
-                return (
-                <div key={match.id} className={`${cardStyle} rounded-xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-2 backdrop-blur-sm`}>
-                  {editingMatch === match.id ? (
-                    <div className="p-4">
-                      <EditMatchForm
-                        match={match}
-                        courts={courts}
-                        players={players}
-                        onSave={(updatedMatch) => updateMatch(match.id, updatedMatch)}
-                        onCancel={() => setEditingMatch(null)}
-                        onDelete={() => deleteMatch(match.id)}
-                      />
-                    </div>
-                  ) : (
-                    <div 
-                      className="p-4 cursor-pointer space-y-3"
-                      onClick={() => setEditingMatch(match.id)}
-                    >
-                      {/* Header Row: Date, Time, Court */}
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                        <div className="flex items-center text-lg font-bold text-slate-800 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
-                          <Calendar className="mr-2 h-4 w-4 text-orange-600" />
-                          {formatDate(match.date)}
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
-                            <Clock className="mr-1 h-4 w-4 text-teal-600" />
-                            <span className="font-semibold">{formatTime(match.time)}</span>
-                          </div>
-                          <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
-                            <MapPin className="mr-1 h-4 w-4 text-purple-600" />
-                            <span className="font-semibold">{getCourtName(match.court)}</span>
-                          </div>
-                        </div>
+            gamesList.map((match, index) => {
+              const cardGradients = [
+                'bg-gradient-to-br from-orange-100 to-red-100 border-orange-200',
+                'bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200', 
+                'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-200',
+                'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-200',
+                'bg-gradient-to-br from-green-100 to-teal-100 border-green-200'
+              ];
+              const cardStyle = cardGradients[index % cardGradients.length];
+              
+              return (
+              <div key={match.id} className={`${cardStyle} rounded-xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-2 backdrop-blur-sm`}>
+                {editingMatch === match.id ? (
+                  <div className="p-4">
+                    <EditMatchForm
+                      match={match}
+                      courts={courts}
+                      players={players}
+                      onSave={(updatedMatch) => updateMatch(match.id, updatedMatch)}
+                      onCancel={() => setEditingMatch(null)}
+                      onDelete={() => deleteMatch(match.id)}
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="p-4 cursor-pointer space-y-3"
+                    onClick={() => setEditingMatch(match.id)}
+                  >
+                    {/* Header Row: Date, Time, Court */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                      <div className="flex items-center text-lg font-bold text-slate-800 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                        <Calendar className="mr-2 h-4 w-4 text-orange-600" />
+                        {formatDate(match.date)}
                       </div>
-                      
-                      {/* Players Row */}
-                      <div className="flex items-start gap-2">
-                        <Users className="h-4 w-4 text-slate-600 mt-1 flex-shrink-0" />
-                        <div className="flex flex-wrap gap-2">
-                          {match.players.map((playerId, playerIndex) => {
-                            const playerColors = [
-                              'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md',
-                              'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md',
-                              'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md',
-                              'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md',
-                              'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md',
-                              'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
-                            ];
-                            const playerColor = playerColors[playerIndex % playerColors.length];
-                            
-                            return (
-                            <span
-                              key={playerId}
-                              className={`${playerColor} px-3 py-1 rounded-full text-sm font-semibold transform hover:scale-105 transition-all duration-200`}
-                            >
-                              {getPlayerName(playerId)}
-                            </span>
-                            );
-                          })}
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                          <Clock className="mr-1 h-4 w-4 text-teal-600" />
+                          <span className="font-semibold">{formatTime(match.time)}</span>
+                        </div>
+                        <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                          <MapPin className="mr-1 h-4 w-4 text-purple-600" />
+                          <span className="font-semibold">{getCourtName(match.court)}</span>
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-                );
-              })
+                    
+                    {/* Players Row */}
+                    <div className="flex items-start gap-2">
+                      <Users className="h-4 w-4 text-slate-600 mt-1 flex-shrink-0" />
+                      <div className="flex flex-wrap gap-2">
+                        {match.players.map((playerId, playerIndex) => {
+                          const playerColors = [
+                            'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md',
+                            'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md',
+                            'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md',
+                            'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md',
+                            'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md',
+                            'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
+                          ];
+                          const playerColor = playerColors[playerIndex % playerColors.length];
+                          
+                          return (
+                          <span
+                            key={playerId}
+                            className={`${playerColor} px-3 py-1 rounded-full text-sm font-semibold transform hover:scale-105 transition-all duration-200`}
+                          >
+                            {getPlayerName(playerId)}
+                          </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              );
+            })
           )}
         </div>
       </div>
-    </div>
-  );
+    );
+
+    return (
+      <div className="space-y-6">
+        {/* Scheduled Games */}
+        {renderGamesSection(
+          futureMatches, 
+          "Scheduled Games", 
+          "No upcoming games scheduled. Create your first game using 'New Game' above!",
+          "bg-gradient-to-r from-orange-500 to-teal-500"
+        )}
+        
+        {/* Previous Games */}
+        {renderGamesSection(
+          pastMatches,
+          "Previous Games",
+          "No previous games found.",
+          "bg-gradient-to-r from-gray-500 to-slate-600"
+        )}
+      </div>
+    );
+  };
 
   const PlayersTab = React.memo(() => (
     <div className="space-y-6">
-      {/* Add New Player */}
-      <AddPlayerForm 
-        onAddPlayer={addPlayer}
-      />
-
       {/* Players List */}
       <div className="bg-gradient-to-r from-white to-teal-50 rounded-xl shadow-lg border border-teal-100">
         <div className="p-6 border-b border-teal-200 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-t-xl">
-          <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
-            <Users className="mr-2 h-5 w-5" />
-            Players ({players.length})
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
+              <Users className="mr-2 h-5 w-5" />
+              Players ({players.length})
+            </h3>
+            <button
+              onClick={() => setShowAddPlayerModal(true)}
+              className="bg-white text-teal-600 px-4 py-2 rounded-xl hover:bg-gray-50 hover:text-teal-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center font-semibold border border-white"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Player
+            </button>
+          </div>
         </div>
         
         <div className="space-y-4 p-4 sm:p-6">
@@ -900,6 +983,13 @@ const PickleballScheduler = () => {
         player={selectedPlayer}
         onSave={(updatedPlayer) => updatePlayer(selectedPlayer.id, updatedPlayer)}
         onDelete={() => deletePlayer(selectedPlayer.id)}
+      />
+
+      {/* Add Player Modal */}
+      <AddPlayerModal
+        isOpen={showAddPlayerModal}
+        onClose={() => setShowAddPlayerModal(false)}
+        onAddPlayer={addPlayer}
       />
     </div>
   );
