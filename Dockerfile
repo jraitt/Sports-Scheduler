@@ -13,11 +13,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build the application for production
-RUN npm run build
-
 # Expose port 3030
 EXPOSE 3030
 
-# Start the preview server (serves built files)
-CMD ["npm", "run", "preview"]
+# Default command - will be overridden by docker-compose
+CMD ["npm", "run", "dev"]

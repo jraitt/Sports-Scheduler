@@ -3,6 +3,7 @@ version: '3.8'
 services:
   sports-scheduler:
     build: .
+    command: ${DOCKER_COMMAND}
     ports:
       - "${DOCKER_HOST_PORT}:${DOCKER_CONTAINER_PORT}"
     volumes:

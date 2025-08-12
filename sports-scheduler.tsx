@@ -544,6 +544,17 @@ const PickleballScheduler = () => {
     });
   };
 
+  const formatTime = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   const ScheduleTab = () => (
     <div className="space-y-6">
       {/* Schedule New Match Button */}
@@ -598,7 +609,7 @@ const PickleballScheduler = () => {
                           </div>
                           <div className="flex items-center text-gray-600">
                             <Clock className="mr-1 h-4 w-4" />
-                            {match.time}
+                            {formatTime(match.time)}
                           </div>
                           <div className="flex items-center text-gray-600">
                             <MapPin className="mr-1 h-4 w-4" />
