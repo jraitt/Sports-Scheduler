@@ -24,9 +24,9 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
   };
 
   return (
-    <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
-      <h4 className="text-md font-semibold text-gray-800 flex items-center">
-        <Edit3 className="mr-2 h-4 w-4" />
+    <div className="space-y-4 p-4 bg-gradient-to-br from-white to-teal-50 rounded-xl border border-teal-200 shadow-inner">
+      <h4 className="text-md font-semibold text-slate-800 flex items-center">
+        <Edit3 className="mr-2 h-4 w-4 text-teal-600" />
         Edit Game
       </h4>
       
@@ -44,6 +44,7 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
           value={editData.time}
           onChange={(e) => setEditData({ ...editData, time: e.target.value })}
           className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          step="900"
         />
         
         <select
@@ -84,21 +85,21 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
         <button
           onClick={() => onSave({ ...editData, court: parseInt(editData.court) })}
           disabled={!editData.date || !editData.time || !editData.court || editData.players.length < 2}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+          className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-4 py-2 rounded-xl hover:from-teal-600 hover:to-cyan-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           <Save className="h-4 w-4 mr-2" />
           Save
         </button>
         <button
           onClick={onCancel}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
+          className="bg-gradient-to-r from-slate-500 to-slate-600 text-white px-4 py-2 rounded-xl hover:from-slate-600 hover:to-slate-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           <X className="h-4 w-4 mr-2" />
           Cancel
         </button>
         <button
           onClick={onDelete}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+          className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           <Trash2 className="h-4 w-4 mr-2" />
           Delete
@@ -182,9 +183,9 @@ const AddPlayerForm = React.memo(({ onAddPlayer }) => {
   }, [localPlayer, onAddPlayer]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        <Plus className="mr-2 h-5 w-5" />
+    <div className="bg-gradient-to-r from-white to-purple-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+      <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+        <Plus className="mr-2 h-5 w-5 text-purple-600" />
         Add New Player
       </h3>
       
@@ -219,7 +220,7 @@ const AddPlayerForm = React.memo(({ onAddPlayer }) => {
         <button
           onClick={handleSubmit}
           disabled={!localPlayer.name.trim()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           Add Player
         </button>
@@ -236,7 +237,7 @@ const NewGameModal = React.memo(({
   courts, 
   newMatch, 
   setNewMatch, 
-  togglePlayerInMatch 
+  togglePlayerInMatch
 }) => {
   if (!isOpen) return null;
 
@@ -251,16 +252,16 @@ const NewGameModal = React.memo(({
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gradient-to-br from-white to-orange-50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-orange-200">
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+        <div className="flex items-center justify-between p-6 border-b border-orange-200 bg-gradient-to-r from-orange-500 to-teal-500 rounded-t-xl">
+          <h2 className="text-xl font-semibold text-white flex items-center drop-shadow-sm">
             <Plus className="mr-2 h-5 w-5" />
             New Game
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-white/80 hover:text-white transition-colors hover:bg-white/20 rounded-full p-1"
           >
             <X className="h-6 w-6" />
           </button>
@@ -292,6 +293,7 @@ const NewGameModal = React.memo(({
                 value={newMatch.time}
                 onChange={(e) => setNewMatch({ ...newMatch, time: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                step="900"
               />
             </div>
             
@@ -342,10 +344,10 @@ const NewGameModal = React.memo(({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-end space-x-3 p-6 border-t border-orange-200 bg-gradient-to-r from-orange-50 to-teal-50 rounded-b-xl">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
           >
             Cancel
           </button>
@@ -355,7 +357,7 @@ const NewGameModal = React.memo(({
               onClose();
             }}
             disabled={!newMatch.date || !newMatch.time || !newMatch.court || newMatch.players.length < 2}
-            className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-teal-500 rounded-xl hover:from-orange-600 hover:to-teal-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Create Game
           </button>
@@ -371,6 +373,7 @@ const PickleballScheduler = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   
   const [courts] = useState([
     { id: 1, name: 'Sue L', location: 'Backyard' },
@@ -380,7 +383,7 @@ const PickleballScheduler = () => {
 
   const [newMatch, setNewMatch] = useState({
     date: '',
-    time: '',
+    time: '17:30',
     court: '',
     players: []
   });
@@ -433,7 +436,7 @@ const PickleballScheduler = () => {
         
         const createdMatch = await matchesAPI.create(matchData);
         setMatches([...matches, createdMatch]);
-        setNewMatch({ date: '', time: '', court: '', players: [] });
+        setNewMatch({ date: '', time: '17:30', court: '', players: [] });
       } catch (err) {
         console.error('Error adding match:', err);
         setError('Failed to add game. Please try again.');
@@ -566,9 +569,9 @@ const PickleballScheduler = () => {
   const ScheduleTab = () => (
     <div className="space-y-6">
       {/* Scheduled Games */}
-      <div className="bg-white rounded-lg shadow-md">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+      <div className="bg-gradient-to-r from-white to-orange-50 rounded-xl shadow-lg border border-orange-100">
+        <div className="p-6 border-b border-orange-200 bg-gradient-to-r from-orange-500 to-teal-500 rounded-t-xl">
+          <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
             <Calendar className="mr-2 h-5 w-5" />
             Scheduled Games
           </h3>
@@ -582,8 +585,18 @@ const PickleballScheduler = () => {
           ) : (
             matches
               .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))
-              .map(match => (
-                <div key={match.id} className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200">
+              .map((match, index) => {
+                const cardGradients = [
+                  'bg-gradient-to-br from-orange-100 to-red-100 border-orange-200',
+                  'bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200', 
+                  'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-200',
+                  'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-200',
+                  'bg-gradient-to-br from-green-100 to-teal-100 border-green-200'
+                ];
+                const cardStyle = cardGradients[index % cardGradients.length];
+                
+                return (
+                <div key={match.id} className={`${cardStyle} rounded-xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-2 backdrop-blur-sm`}>
                   {editingMatch === match.id ? (
                     <div className="p-4">
                       <EditMatchForm
@@ -602,40 +615,53 @@ const PickleballScheduler = () => {
                     >
                       {/* Header Row: Date, Time, Court */}
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                        <div className="flex items-center text-lg font-semibold text-gray-900">
-                          <Calendar className="mr-2 h-4 w-4 text-gray-500" />
+                        <div className="flex items-center text-lg font-bold text-slate-800 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                          <Calendar className="mr-2 h-4 w-4 text-orange-600" />
                           {formatDate(match.date)}
                         </div>
                         <div className="flex items-center gap-4">
-                          <div className="flex items-center text-gray-600">
-                            <Clock className="mr-1 h-4 w-4" />
-                            <span className="font-medium">{formatTime(match.time)}</span>
+                          <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                            <Clock className="mr-1 h-4 w-4 text-teal-600" />
+                            <span className="font-semibold">{formatTime(match.time)}</span>
                           </div>
-                          <div className="flex items-center text-gray-600">
-                            <MapPin className="mr-1 h-4 w-4" />
-                            <span className="font-medium">{getCourtName(match.court)}</span>
+                          <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                            <MapPin className="mr-1 h-4 w-4 text-purple-600" />
+                            <span className="font-semibold">{getCourtName(match.court)}</span>
                           </div>
                         </div>
                       </div>
                       
                       {/* Players Row */}
                       <div className="flex items-start gap-2">
-                        <Users className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                        <Users className="h-4 w-4 text-slate-600 mt-1 flex-shrink-0" />
                         <div className="flex flex-wrap gap-2">
-                          {match.players.map(playerId => (
+                          {match.players.map((playerId, playerIndex) => {
+                            const playerColors = [
+                              'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md',
+                              'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md',
+                              'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md',
+                              'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md',
+                              'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md',
+                              'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
+                            ];
+                            const playerColor = playerColors[playerIndex % playerColors.length];
+                            
+                            return (
                             <span
                               key={playerId}
-                              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                              className={`${playerColor} px-3 py-1 rounded-full text-sm font-semibold transform hover:scale-105 transition-all duration-200`}
                             >
                               {getPlayerName(playerId)}
                             </span>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
-              ))
+                );
+              })
           )}
         </div>
       </div>
@@ -650,9 +676,9 @@ const PickleballScheduler = () => {
       />
 
       {/* Players List */}
-      <div className="bg-white rounded-lg shadow-md">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+      <div className="bg-gradient-to-r from-white to-teal-50 rounded-xl shadow-lg border border-teal-100">
+        <div className="p-6 border-b border-teal-200 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-t-xl">
+          <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
             <Users className="mr-2 h-5 w-5" />
             Players ({players.length})
           </h3>
@@ -721,15 +747,15 @@ const PickleballScheduler = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-gradient-to-r from-orange-500 to-teal-500 shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-2xl font-bold text-white flex items-center drop-shadow-sm">
               🏓 Pickleball Scheduler
             </h1>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-orange-100 font-medium">
               {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -763,14 +789,14 @@ const PickleballScheduler = () => {
 
       {/* Navigation */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-orange-200">
           <nav className="-mb-px flex space-x-8 pt-4">
             <button
               onClick={() => setActiveTab('schedule')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
                 activeTab === 'schedule'
-                  ? 'border-green-500 text-green-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-orange-500 text-orange-600 transform scale-105'
+                  : 'border-transparent text-slate-600 hover:text-orange-600 hover:border-orange-300'
               }`}
             >
               <Calendar className="inline h-4 w-4 mr-1" />
@@ -778,10 +804,10 @@ const PickleballScheduler = () => {
             </button>
             <button
               onClick={() => setActiveTab('players')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
                 activeTab === 'players'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-teal-500 text-teal-600 transform scale-105'
+                  : 'border-transparent text-slate-600 hover:text-teal-600 hover:border-teal-300'
               }`}
             >
               <Users className="inline h-4 w-4 mr-1" />
@@ -789,7 +815,7 @@ const PickleballScheduler = () => {
             </button>
             <button
               onClick={() => setShowNewGameModal(true)}
-              className="py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors"
+              className="py-2 px-1 border-b-2 border-transparent font-medium text-sm text-slate-600 hover:text-yellow-600 hover:border-yellow-300 transition-all duration-200 hover:transform hover:scale-105"
             >
               <Plus className="inline h-4 w-4 mr-1" />
               New Game
