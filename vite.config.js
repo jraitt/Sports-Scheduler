@@ -9,5 +9,10 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
+  },
+  preview: {
+    host: process.env.VITE_HOST || '0.0.0.0',
+    port: parseInt(process.env.VITE_PORT) || 3030,
+    strictPort: true
   }
 })
