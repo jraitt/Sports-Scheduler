@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Users, Clock, MapPin, Plus, Trash2, Edit3, Save, X } from 'lucide-react';
 import { playersAPI, matchesAPI } from './src/supabase';
 
-const EditMatchForm = ({ match, courts, players, onSave, onCancel }) => {
+const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) => {
   const [editData, setEditData] = useState({
     ...match,
     court: match.court.toString()
@@ -27,7 +27,7 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel }) => {
     <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
       <h4 className="text-md font-semibold text-gray-800 flex items-center">
         <Edit3 className="mr-2 h-4 w-4" />
-        Edit Match
+        Edit Game
       </h4>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -80,21 +80,28 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel }) => {
         </div>
       </div>
       
-      <div className="flex space-x-2">
+      <div className="grid grid-cols-3 gap-3">
         <button
           onClick={() => onSave({ ...editData, court: parseInt(editData.court) })}
           disabled={!editData.date || !editData.time || !editData.court || editData.players.length < 2}
-          className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center"
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
         >
-          <Save className="h-4 w-4 mr-1" />
-          Save Changes
+          <Save className="h-4 w-4 mr-2" />
+          Save
         </button>
         <button
           onClick={onCancel}
-          className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition-colors flex items-center"
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center"
         >
-          <X className="h-4 w-4 mr-1" />
+          <X className="h-4 w-4 mr-2" />
           Cancel
+        </button>
+        <button
+          onClick={onDelete}
+          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete
         </button>
       </div>
     </div>
@@ -221,7 +228,7 @@ const AddPlayerForm = React.memo(({ onAddPlayer }) => {
   );
 });
 
-const ScheduleMatchModal = React.memo(({ 
+const NewGameModal = React.memo(({ 
   isOpen, 
   onClose, 
   onSubmit, 
@@ -249,7 +256,7 @@ const ScheduleMatchModal = React.memo(({
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center">
             <Plus className="mr-2 h-5 w-5" />
-            Schedule New Match
+            New Game
           </h2>
           <button
             onClick={onClose}
@@ -350,7 +357,7 @@ const ScheduleMatchModal = React.memo(({
             disabled={!newMatch.date || !newMatch.time || !newMatch.court || newMatch.players.length < 2}
             className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            Schedule Match
+            Create Game
           </button>
         </div>
       </div>
@@ -380,12 +387,13 @@ const PickleballScheduler = () => {
 
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [editingMatch, setEditingMatch] = useState(null);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showNewGameModal, setShowNewGameModal] = useState(false);
 
   // Load data from Supabase on component mount
   useEffect(() => {
     loadInitialData();
   }, []);
+
 
   const loadInitialData = async () => {
     try {
@@ -428,7 +436,7 @@ const PickleballScheduler = () => {
         setNewMatch({ date: '', time: '', court: '', players: [] });
       } catch (err) {
         console.error('Error adding match:', err);
-        setError('Failed to add match. Please try again.');
+        setError('Failed to add game. Please try again.');
       }
     }
   };
@@ -439,7 +447,7 @@ const PickleballScheduler = () => {
       setMatches(matches.filter(match => match.id !== id));
     } catch (err) {
       console.error('Error deleting match:', err);
-      setError('Failed to delete match. Please try again.');
+      setError('Failed to delete game. Please try again.');
     }
   };
 
@@ -452,7 +460,7 @@ const PickleballScheduler = () => {
       setEditingMatch(null);
     } catch (err) {
       console.error('Error updating match:', err);
-      setError('Failed to update match. Please try again.');
+      setError('Failed to update game. Please try again.');
     }
   };
 
@@ -557,96 +565,72 @@ const PickleballScheduler = () => {
 
   const ScheduleTab = () => (
     <div className="space-y-6">
-      {/* Schedule New Match Button */}
-      <div className="bg-white rounded-lg shadow-md p-6 text-center border-l-4 border-green-500">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Ready to schedule a new match?</h3>
-        <button
-          onClick={() => setShowScheduleModal(true)}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center mx-auto text-lg font-medium"
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          Schedule New Match
-        </button>
-        <p className="text-gray-600 text-sm mt-2">
-          Add match details and select players
-        </p>
-      </div>
-
-      {/* Scheduled Matches */}
+      {/* Scheduled Games */}
       <div className="bg-white rounded-lg shadow-md">
         <div className="p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 flex items-center">
             <Calendar className="mr-2 h-5 w-5" />
-            Scheduled Matches
+            Scheduled Games
           </h3>
         </div>
         
-        <div className="divide-y divide-gray-200">
+        <div className="space-y-4 p-4 sm:p-6">
           {matches.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
-              No matches scheduled yet. Create your first match above!
+            <div className="text-center text-gray-500 py-8">
+              No games scheduled yet. Create your first game using "New Game" above!
             </div>
           ) : (
             matches
               .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))
               .map(match => (
-                <div key={match.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div key={match.id} className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200">
                   {editingMatch === match.id ? (
-                    <EditMatchForm
-                      match={match}
-                      courts={courts}
-                      players={players}
-                      onSave={(updatedMatch) => updateMatch(match.id, updatedMatch)}
-                      onCancel={() => setEditingMatch(null)}
-                    />
+                    <div className="p-4">
+                      <EditMatchForm
+                        match={match}
+                        courts={courts}
+                        players={players}
+                        onSave={(updatedMatch) => updateMatch(match.id, updatedMatch)}
+                        onCancel={() => setEditingMatch(null)}
+                        onDelete={() => deleteMatch(match.id)}
+                      />
+                    </div>
                   ) : (
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-4 mb-2">
-                          <div className="flex items-center text-lg font-medium text-gray-900">
-                            <Calendar className="mr-2 h-4 w-4" />
-                            {formatDate(match.date)}
-                          </div>
+                    <div 
+                      className="p-4 cursor-pointer space-y-3"
+                      onClick={() => setEditingMatch(match.id)}
+                    >
+                      {/* Header Row: Date, Time, Court */}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <div className="flex items-center text-lg font-semibold text-gray-900">
+                          <Calendar className="mr-2 h-4 w-4 text-gray-500" />
+                          {formatDate(match.date)}
+                        </div>
+                        <div className="flex items-center gap-4">
                           <div className="flex items-center text-gray-600">
                             <Clock className="mr-1 h-4 w-4" />
-                            {formatTime(match.time)}
+                            <span className="font-medium">{formatTime(match.time)}</span>
                           </div>
                           <div className="flex items-center text-gray-600">
                             <MapPin className="mr-1 h-4 w-4" />
-                            {getCourtName(match.court)}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Users className="h-4 w-4 text-gray-500" />
-                          <div className="flex flex-wrap gap-2">
-                            {match.players.map(playerId => (
-                              <span
-                                key={playerId}
-                                className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium"
-                              >
-                                {getPlayerName(playerId)}
-                              </span>
-                            ))}
+                            <span className="font-medium">{getCourtName(match.court)}</span>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="flex space-x-2 ml-4">
-                        <button
-                          onClick={() => setEditingMatch(match.id)}
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
-                          title="Edit match"
-                        >
-                          <Edit3 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteMatch(match.id)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
-                          title="Delete match"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                      {/* Players Row */}
+                      <div className="flex items-start gap-2">
+                        <Users className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                        <div className="flex flex-wrap gap-2">
+                          {match.players.map(playerId => (
+                            <span
+                              key={playerId}
+                              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                            >
+                              {getPlayerName(playerId)}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -803,6 +787,13 @@ const PickleballScheduler = () => {
               <Users className="inline h-4 w-4 mr-1" />
               Players
             </button>
+            <button
+              onClick={() => setShowNewGameModal(true)}
+              className="py-2 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 transition-colors"
+            >
+              <Plus className="inline h-4 w-4 mr-1" />
+              New Game
+            </button>
           </nav>
         </div>
       </div>
@@ -812,10 +803,10 @@ const PickleballScheduler = () => {
         {activeTab === 'schedule' ? <ScheduleTab /> : <PlayersTab />}
       </div>
 
-      {/* Schedule Match Modal */}
-      <ScheduleMatchModal
-        isOpen={showScheduleModal}
-        onClose={() => setShowScheduleModal(false)}
+      {/* New Game Modal */}
+      <NewGameModal
+        isOpen={showNewGameModal}
+        onClose={() => setShowNewGameModal(false)}
         onSubmit={addMatch}
         players={players}
         courts={courts}
