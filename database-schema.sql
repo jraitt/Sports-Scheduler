@@ -5,7 +5,6 @@
 CREATE TABLE IF NOT EXISTS players (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    skill VARCHAR(50) NOT NULL CHECK (skill IN ('Beginner', 'Intermediate', 'Advanced')),
     phone VARCHAR(50),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
