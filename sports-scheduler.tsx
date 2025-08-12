@@ -75,7 +75,6 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
               }`}
             >
               {player.name}
-              <div className="text-xs opacity-75">{player.skill}</div>
             </button>
           ))}
         </div>
@@ -109,67 +108,128 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
   );
 };
 
-const EditPlayerForm = ({ player, onSave, onCancel }) => {
-  const [editData, setEditData] = useState(player);
+const EditPlayerModal = React.memo(({ 
+  isOpen, 
+  onClose, 
+  player,
+  onSave,
+  onDelete
+}) => {
+  const [editData, setEditData] = useState(player || { name: '', phone: '' });
+
+  // Update editData when player changes
+  React.useEffect(() => {
+    if (player) {
+      setEditData(player);
+    }
+  }, [player]);
+
+  if (!isOpen || !player) return null;
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleSave = () => {
+    onSave(editData);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    onDelete();
+    onClose();
+  };
 
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input
-          type="text"
-          value={editData.name}
-          onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        
-        <select
-          value={editData.skill}
-          onChange={(e) => setEditData({ ...editData, skill: e.target.value })}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
-        </select>
-        
-        <input
-          type="tel"
-          value={editData.phone}
-          onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-      </div>
-      
-      <div className="flex space-x-2">
-        <button
-          onClick={() => onSave(editData)}
-          className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-        >
-          <Save className="h-4 w-4 mr-1" />
-          Save
-        </button>
-        <button
-          onClick={onCancel}
-          className="bg-gray-500 text-white px-3 py-1 rounded-lg hover:bg-gray-600 transition-colors flex items-center"
-        >
-          <X className="h-4 w-4 mr-1" />
-          Cancel
-        </button>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-gradient-to-br from-white to-teal-50 rounded-xl shadow-2xl max-w-md w-full border border-teal-200">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between p-6 border-b border-teal-200 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-t-xl">
+          <h2 className="text-xl font-semibold text-white flex items-center drop-shadow-sm">
+            <Edit3 className="mr-2 h-5 w-5" />
+            Edit Player
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-white/80 hover:text-white transition-colors hover:bg-white/20 rounded-full p-1"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        {/* Modal Content */}
+        <div className="p-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Player Name
+              </label>
+              <input
+                type="text"
+                value={editData.name}
+                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={editData.phone}
+                onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex items-center justify-between p-6 border-t border-teal-200 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-b-xl">
+          <div className="flex space-x-3">
+            <button
+              onClick={handleSave}
+              disabled={!editData.name.trim()}
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl hover:from-teal-600 hover:to-cyan-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+            >
+              Cancel
+            </button>
+          </div>
+          
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </button>
+        </div>
       </div>
     </div>
   );
-};
+});
 
 const AddPlayerForm = React.memo(({ onAddPlayer }) => {
-  const [localPlayer, setLocalPlayer] = useState({ name: '', skill: 'Beginner', phone: '' });
+  const [localPlayer, setLocalPlayer] = useState({ name: '', phone: '' });
 
   const handleNameChange = useCallback((e) => {
     setLocalPlayer(prev => ({ ...prev, name: e.target.value }));
   }, []);
 
-  const handleSkillChange = useCallback((e) => {
-    setLocalPlayer(prev => ({ ...prev, skill: e.target.value }));
-  }, []);
 
   const handlePhoneChange = useCallback((e) => {
     setLocalPlayer(prev => ({ ...prev, phone: e.target.value }));
@@ -178,7 +238,7 @@ const AddPlayerForm = React.memo(({ onAddPlayer }) => {
   const handleSubmit = useCallback(() => {
     if (localPlayer.name.trim()) {
       onAddPlayer(localPlayer);
-      setLocalPlayer({ name: '', skill: 'Beginner', phone: '' });
+      setLocalPlayer({ name: '', phone: '' });
     }
   }, [localPlayer, onAddPlayer]);
 
@@ -189,7 +249,7 @@ const AddPlayerForm = React.memo(({ onAddPlayer }) => {
         Add New Player
       </h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <input
           type="text"
           placeholder="Player Name"
@@ -198,16 +258,6 @@ const AddPlayerForm = React.memo(({ onAddPlayer }) => {
           className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           autoComplete="off"
         />
-        
-        <select
-          value={localPlayer.skill}
-          onChange={handleSkillChange}
-          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
-        </select>
         
         <input
           type="tel"
@@ -331,7 +381,6 @@ const NewGameModal = React.memo(({
                   }`}
                 >
                   {player.name}
-                  <div className="text-xs opacity-75">{player.skill}</div>
                 </button>
               ))}
             </div>
@@ -388,9 +437,10 @@ const PickleballScheduler = () => {
     players: []
   });
 
-  const [editingPlayer, setEditingPlayer] = useState(null);
   const [editingMatch, setEditingMatch] = useState(null);
   const [showNewGameModal, setShowNewGameModal] = useState(false);
+  const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   // Load data from Supabase on component mount
   useEffect(() => {
@@ -485,7 +535,8 @@ const PickleballScheduler = () => {
       setPlayers(players.map(player => 
         player.id === id ? updated : player
       ));
-      setEditingPlayer(null);
+      setShowEditPlayerModal(false);
+      setSelectedPlayer(null);
     } catch (err) {
       console.error('Error updating player:', err);
       setError('Failed to update player. Please try again.');
@@ -515,6 +566,8 @@ const PickleballScheduler = () => {
       }
       
       setMatches(updatedMatches);
+      setShowEditPlayerModal(false);
+      setSelectedPlayer(null);
     } catch (err) {
       console.error('Error deleting player:', err);
       setError('Failed to delete player. Please try again.');
@@ -684,51 +737,47 @@ const PickleballScheduler = () => {
           </h3>
         </div>
         
-        <div className="divide-y divide-gray-200">
-          {players.map(player => (
-            <div key={player.id} className="p-6 hover:bg-gray-50 transition-colors">
-              {editingPlayer === player.id ? (
-                <EditPlayerForm 
-                  player={player} 
-                  onSave={(updatedPlayer) => updatePlayer(player.id, updatedPlayer)}
-                  onCancel={() => setEditingPlayer(null)}
-                />
-              ) : (
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="text-lg font-medium text-gray-900">{player.name}</div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        player.skill === 'Beginner' ? 'bg-green-100 text-green-800' :
-                        player.skill === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {player.skill}
-                      </span>
-                      {player.phone && <span>{player.phone}</span>}
+        <div className="space-y-4 p-4 sm:p-6">
+          {players.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              No players added yet. Use the form above to add your first player!
+            </div>
+          ) : (
+            players.map((player, index) => {
+              const cardGradients = [
+                'bg-gradient-to-br from-teal-100 to-cyan-100 border-teal-200',
+                'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-200', 
+                'bg-gradient-to-br from-orange-100 to-red-100 border-orange-200',
+                'bg-gradient-to-br from-yellow-100 to-orange-100 border-yellow-200',
+                'bg-gradient-to-br from-green-100 to-teal-100 border-green-200'
+              ];
+              const cardStyle = cardGradients[index % cardGradients.length];
+              
+              return (
+                <div 
+                  key={player.id} 
+                  className={`${cardStyle} rounded-xl hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-2 backdrop-blur-sm cursor-pointer`}
+                  onClick={() => {
+                    setSelectedPlayer(player);
+                    setShowEditPlayerModal(true);
+                  }}
+                >
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center text-lg font-bold text-slate-800 bg-white/60 rounded-lg px-3 py-2 shadow-sm">
+                      <Users className="mr-2 h-4 w-4 text-teal-600" />
+                      {player.name}
                     </div>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingPlayer(player.id)}
-                      className="text-blue-600 hover:text-blue-800 transition-colors"
-                      title="Edit player"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => deletePlayer(player.id)}
-                      className="text-red-600 hover:text-red-800 transition-colors"
-                      title="Delete player"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    
+                    {player.phone && (
+                      <div className="flex items-center text-slate-700 bg-white/60 rounded-lg px-3 py-1 shadow-sm">
+                        <span className="text-sm">{player.phone}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            })
+          )}
         </div>
       </div>
     </div>
@@ -839,6 +888,18 @@ const PickleballScheduler = () => {
         newMatch={newMatch}
         setNewMatch={setNewMatch}
         togglePlayerInMatch={togglePlayerInMatch}
+      />
+
+      {/* Edit Player Modal */}
+      <EditPlayerModal
+        isOpen={showEditPlayerModal}
+        onClose={() => {
+          setShowEditPlayerModal(false);
+          setSelectedPlayer(null);
+        }}
+        player={selectedPlayer}
+        onSave={(updatedPlayer) => updatePlayer(selectedPlayer.id, updatedPlayer)}
+        onDelete={() => deletePlayer(selectedPlayer.id)}
       />
     </div>
   );
