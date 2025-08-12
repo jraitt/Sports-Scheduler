@@ -67,10 +67,10 @@ const EditMatchForm = ({ match, courts, players, onSave, onCancel, onDelete }) =
             <button
               key={player.id}
               onClick={() => togglePlayerInEditMatch(player.id)}
-              className={`p-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`p-2 rounded-lg text-sm font-medium transition-colors border-2 ${
                 editData.players.includes(player.id)
-                  ? 'bg-blue-100 text-blue-800 border-2 border-blue-300'
-                  : 'bg-gray-100 text-gray-700 border-2 border-gray-200 hover:bg-gray-200'
+                  ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                  : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'
               }`}
             >
               {player.name}
@@ -422,7 +422,7 @@ const NewGameModal = React.memo(({
                   onClick={() => togglePlayerInMatch(player.id)}
                   className={`p-3 rounded-lg text-sm font-medium transition-colors border-2 ${
                     newMatch.players.includes(player.id)
-                      ? 'bg-green-100 text-green-800 border-green-300'
+                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
                       : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                   }`}
                 >
@@ -468,6 +468,55 @@ const PickleballScheduler = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Player color system
+  const playerColors = [
+    { bg: 'bg-red-500', text: 'text-white', name: 'Red' },
+    { bg: 'bg-blue-500', text: 'text-white', name: 'Blue' },
+    { bg: 'bg-green-500', text: 'text-white', name: 'Green' },
+    { bg: 'bg-yellow-500', text: 'text-black', name: 'Yellow' },
+    { bg: 'bg-purple-500', text: 'text-white', name: 'Purple' },
+    { bg: 'bg-orange-500', text: 'text-white', name: 'Orange' },
+    { bg: 'bg-pink-500', text: 'text-white', name: 'Pink' },
+    { bg: 'bg-indigo-500', text: 'text-white', name: 'Indigo' },
+    { bg: 'bg-teal-500', text: 'text-white', name: 'Teal' },
+    { bg: 'bg-cyan-500', text: 'text-white', name: 'Cyan' },
+    { bg: 'bg-lime-500', text: 'text-black', name: 'Lime' },
+    { bg: 'bg-emerald-500', text: 'text-white', name: 'Emerald' }
+  ];
+
+  const getPlayerColor = (playerId) => {
+    const savedColors = JSON.parse(localStorage.getItem('player-colors') || '{}');
+    
+    if (savedColors[playerId] !== undefined) {
+      return playerColors[savedColors[playerId]];
+    }
+    
+    // Assign new color based on existing assignments to avoid duplicates
+    const usedColors = Object.values(savedColors);
+    let colorIndex = 0;
+    
+    // Find first unused color, or cycle through if all are used
+    while (usedColors.includes(colorIndex) && colorIndex < playerColors.length) {
+      colorIndex++;
+    }
+    
+    if (colorIndex >= playerColors.length) {
+      // If all colors are used, use modulo to cycle through
+      colorIndex = Object.keys(savedColors).length % playerColors.length;
+    }
+    
+    // Save the assignment
+    savedColors[playerId] = colorIndex;
+    localStorage.setItem('player-colors', JSON.stringify(savedColors));
+    
+    return playerColors[colorIndex];
+  };
+
+  const getPlayerColorClasses = (playerId) => {
+    const color = getPlayerColor(playerId);
+    return `${color.bg} ${color.text} shadow-md`;
+  };
 
   
   const [courts] = useState([
@@ -685,10 +734,17 @@ const PickleballScheduler = () => {
     const renderGamesSection = (gamesList, title, emptyMessage, headerGradient) => (
       <div className="bg-gradient-to-r from-white to-orange-50 rounded-xl shadow-lg border border-orange-100">
         <div className={`p-6 border-b border-orange-200 ${headerGradient} rounded-t-xl`}>
-          <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
-            <Calendar className="mr-2 h-5 w-5" />
-            {title} ({gamesList.length})
-          </h3>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-lg font-semibold text-white flex items-center drop-shadow-sm">
+              <Calendar className="mr-2 h-5 w-5" />
+              {title} ({gamesList.length})
+            </h3>
+            {title === "Scheduled Games" && (
+              <p className="text-white/80 text-sm">
+                Select a game below to add players
+              </p>
+            )}
+          </div>
         </div>
         
         <div className="space-y-4 p-4 sm:p-6">
@@ -747,26 +803,14 @@ const PickleballScheduler = () => {
                     <div className="flex items-start gap-2">
                       <Users className="h-4 w-4 text-slate-600 mt-1 flex-shrink-0" />
                       <div className="flex flex-wrap gap-2">
-                        {match.players.map((playerId, playerIndex) => {
-                          const playerColors = [
-                            'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md',
-                            'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md',
-                            'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md',
-                            'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md',
-                            'bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md',
-                            'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
-                          ];
-                          const playerColor = playerColors[playerIndex % playerColors.length];
-                          
-                          return (
+                        {match.players.map((playerId) => (
                           <span
                             key={playerId}
-                            className={`${playerColor} px-3 py-1 rounded-full text-sm font-semibold transform hover:scale-105 transition-all duration-200`}
+                            className={`${getPlayerColorClasses(playerId)} px-3 py-1 rounded-full text-sm font-semibold transform hover:scale-105 transition-all duration-200`}
                           >
                             {getPlayerName(playerId)}
                           </span>
-                          );
-                        })}
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -846,9 +890,12 @@ const PickleballScheduler = () => {
                   }}
                 >
                   <div className="p-4 space-y-2">
-                    <div className="flex items-center text-lg font-bold text-slate-800 bg-white/60 rounded-lg px-3 py-2 shadow-sm">
-                      <Users className="mr-2 h-4 w-4 text-teal-600" />
-                      {player.name}
+                    <div className="flex items-center justify-between text-lg font-bold text-slate-800 bg-white/60 rounded-lg px-3 py-2 shadow-sm">
+                      <div className="flex items-center">
+                        <Users className="mr-2 h-4 w-4 text-teal-600" />
+                        {player.name}
+                      </div>
+                      <div className={`w-6 h-6 rounded-full ${getPlayerColor(player.id).bg} border-2 border-white shadow-sm`}></div>
                     </div>
                     
                     {player.phone && (
