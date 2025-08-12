@@ -794,7 +794,7 @@ const PickleballScheduler = () => {
           pastMatches,
           "Previous Games",
           "No previous games found.",
-          "bg-gradient-to-r from-gray-500 to-slate-600"
+          "bg-gradient-to-r from-purple-600 to-indigo-600"
         )}
       </div>
     );
