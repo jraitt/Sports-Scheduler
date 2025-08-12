@@ -13,7 +13,11 @@
       "Bash(docker-compose:*)",
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_select_option",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(git add:*)",
+      "Bash(curl:*)",
+      "Bash(git push:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
